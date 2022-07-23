@@ -1,0 +1,17 @@
+version: "3.5"
+
+services:
+  mongo:
+    image: mongo:latest
+    container_name: db-mongo
+    # environment:
+    # - POSTGRES_DB=db_product
+    # - POSTGRES_PASSWORD=123456
+    ports:
+    - 27017:27017
+    networks:
+    - msbasic
+networks:
+  msbasic:
+    name: bootcamp_bc26
+

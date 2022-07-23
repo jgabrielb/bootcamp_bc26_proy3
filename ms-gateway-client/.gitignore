@@ -31,13 +31,3 @@ build/
 
 ### VS Code ###
 .vscode/
-
-### Adittional files ###
-*.log
-.log
-
-##############################
-## SONARQUBE
-##############################
-/coverage
-.scannerwork

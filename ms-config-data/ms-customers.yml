@@ -1,0 +1,23 @@
+server:
+  port: 9002
+security:
+  basic:
+    enable: false
+management:
+  security:
+    enabled: false
+spring:
+  cloud:
+    config:
+      enabled: true
+  data:
+    mongodb:
+      #host: localhost
+      #port: 27017
+      #database: bdbootcamp
+      uri: mongodb://db-mongo:27017/bdbootcamp
+eureka:
+  client:
+    enabled: true
+    service-url:
+      defaultZone: http://ms-discovery-server:8761/eureka/

@@ -1,0 +1,95 @@
+version: "3.5"
+
+services:
+  ms-config-service:
+    image: ms-config-service:1.0.0
+    container_name: ms-config-service
+    restart: always
+    ports:
+    - 9001:9001
+    networks:
+      - msbasic
+  ms-discovery-server:
+    image: ms-discovery-server:1.0.0
+    container_name: ms-discovery-server
+    restart: always
+    ports:
+    - 8761:8761
+    networks:
+      - msbasic
+  ms-customers:
+    image: ms-customers:1.0.0
+    container_name: ms-customers
+    restart: always
+    ports:
+    - 9002:9002
+    networks:
+      - msbasic
+  ms-products:
+    image: ms-products:1.0.0
+    container_name: ms-products
+    restart: always
+    ports:
+    - 9003:9003
+    networks:
+      - msbasic
+  ms-accounts:
+    image: ms-accounts:1.0.0
+    container_name: ms-accounts
+    restart: always
+    ports:
+    - 9004:9004
+    networks:
+      - msbasic
+  ms-signatories:
+    image: ms-signatories:1.0.0
+    container_name: ms-signatories
+    restart: always
+    ports:
+    - 9005:9005
+    networks:
+      - msbasic
+  ms-deposits:
+    image: ms-deposits:1.0.0
+    container_name: ms-deposits
+    restart: always
+    ports:
+    - 9006:9006
+    networks:
+      - msbasic
+  ms-withdrawals:
+    image: ms-withdrawals:1.0.0
+    container_name: ms-withdrawals
+    restart: always
+    ports:
+    - 9007:9007
+    networks:
+      - msbasic
+  ms-payments:
+    image: ms-payments:1.0.0
+    container_name: ms-payments
+    restart: always
+    ports:
+    - 9008:9008
+    networks:
+      - msbasic
+  ms-purchase:
+    image: ms-purchase:1.0.0
+    container_name: ms-purchase
+    restart: always
+    ports:
+    - 9009:9009
+    networks:
+      - msbasic
+  ms-gateway-client:
+    image: ms-gateway-client:1.0.0
+    container_name: ms-gateway-client
+    restart: always
+    ports:
+    - 9011:9011
+    networks:
+      - msbasic
+networks:
+  msbasic:
+    name: bootcamp_bc26
+

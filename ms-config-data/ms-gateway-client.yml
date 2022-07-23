@@ -1,0 +1,45 @@
+server:
+  port: 9011
+spring:
+  cloud:
+    config:
+      enabled: true
+    gateway:
+      routes:
+        - id: ms-customers
+          uri: lb://ms-customers
+          predicates:
+            - Path=/customers/**
+        - id: ms-products
+          uri: lb://ms-products
+          predicates:
+            - Path=/products/**
+        - id: ms-accounts
+          uri: lb://ms-accounts
+          predicates:
+            - Path=/accounts/**
+        - id: ms-deposits
+          uri: lb://ms-deposits
+          predicates:
+            - Path=/deposits/**
+        - id: ms-payments
+          uri: lb://ms-payments
+          predicates:
+            - Path=/payments/**
+        - id: ms-purchase
+          uri: lb://ms-purchase
+          predicates:
+            - Path=/purchase/**
+        - id: ms-signatories
+          uri: lb://ms-signatories
+          predicates:
+            - Path=/signatories/**
+        - id: ms-withdrawals
+          uri: lb://ms-withdrawals
+          predicates:
+            - Path=/withdrawals/**
+eureka:
+  client:
+    enabled: true
+    service-url:
+      defaultZone: http://ms-discovery-server:8761/eureka/

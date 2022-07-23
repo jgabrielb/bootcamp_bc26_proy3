@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: ms-payments
+  config:
+    import: optional:configserver:http://ms-config-service:9001

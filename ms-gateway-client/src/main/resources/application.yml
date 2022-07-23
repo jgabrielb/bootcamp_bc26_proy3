@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: ms-gateway-client
+  config:
+    import: optional:configserver:http://ms-config-service:9001
