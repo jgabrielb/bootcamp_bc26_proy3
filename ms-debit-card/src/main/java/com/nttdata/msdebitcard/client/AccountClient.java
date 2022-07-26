@@ -10,34 +10,6 @@ import reactor.core.publisher.Mono;
 public class AccountClient {
     private WebClient client = WebClient.create("http://ms-accounts:9004/accounts");
 
-    public Mono<Account> getAccountWithDetails(String id){
-        return client.get()
-                .uri(uriBuilder -> uriBuilder
-                        .path("/findWithDetailsById/{id}")
-                        .build(id)
-                )
-                .retrieve()
-                .bodyToMono(Account.class);
-    };
-
-    public Mono<Account> updateAccount(Account account){
-        return client.put()
-                .uri(uriBuilder -> uriBuilder
-                        .path("/update/{id}")
-                        .build(account.getId())
-                )
-                .bodyValue(account)
-                .retrieve()
-                .bodyToMono(Account.class);
-    };
-
-    public Flux<Account> findAll(){
-        return client.get()
-                .uri("/findAll")
-                .retrieve()
-                .bodyToFlux(Account.class);
-    };
-
     public Flux<Account> findAllWithDetail(){
         return client.get()
                 .uri("/findAllWithDetail")

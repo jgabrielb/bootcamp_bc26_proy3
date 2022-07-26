@@ -65,14 +65,4 @@ public class DebitCardServiceImpl implements DebitCardService {
         return repository.deleteById(id);
     }
 
-    @Override
-    public Mono<DebitCard> findByAccountId(String id) {
-        return repository.findByTransactionId(id);
-    }
-
-    @Override
-    public Mono<DebitCard> findByCardNumber(String cardNumber) {
-        return repository.findByCardNumber(cardNumber);
-    }
-
 }

@@ -30,12 +30,6 @@ public class DebitCardController {
         return service.findById(id);
     }
 
-    @GetMapping("/findByAccountId/{id}")
-    public Mono<DebitCard> findByAccountId(@PathVariable String id) {
-        LOG.info("Service call findByTransactionId - DebitCard");
-        return service.findByAccountId(id);
-    }
-
     @GetMapping("/accountDetail/{id}")
     public Flux<DebitCard> accountDetail(@PathVariable String id) {
         LOG.info("Service call accountDetail - DebitCard");

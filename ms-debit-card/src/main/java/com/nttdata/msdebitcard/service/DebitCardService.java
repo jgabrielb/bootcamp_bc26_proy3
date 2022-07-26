@@ -12,8 +12,6 @@ public interface DebitCardService {
 
     Mono<DebitCard> findById(String id);
 
-    Mono<DebitCard> findByAccountId(String id);
-
     Mono<DebitCard> update(DebitCard dc, String id);
 
     Mono<Void> delete(String id);
