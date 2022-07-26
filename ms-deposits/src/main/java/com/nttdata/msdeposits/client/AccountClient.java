@@ -19,4 +19,15 @@ public class AccountClient {
                 .retrieve()
                 .bodyToMono(Account.class);
     };
+
+    public Mono<Account> updateAccount(Account account){
+        return client.put()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/update/{id}")
+                        .build(account.getId())
+                )
+                .bodyValue(account)
+                .retrieve()
+                .bodyToMono(Account.class);
+    };
 }

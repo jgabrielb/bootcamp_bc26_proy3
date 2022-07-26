@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.math.BigDecimal;
+
 @Document(collection = "schema_products.products")
 @Data
 @Builder
@@ -20,4 +22,6 @@ public class Products {
     private String descIndProduct;
     private int typeProduct;
     private String descTypeProduct;
+    private BigDecimal amountPerMonth;
+    private BigDecimal amountPerDay;
 }

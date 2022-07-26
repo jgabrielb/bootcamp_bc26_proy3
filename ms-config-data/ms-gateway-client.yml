@@ -38,6 +38,10 @@ spring:
           uri: lb://ms-withdrawals
           predicates:
             - Path=/withdrawals/**
+        - id: ms-transfer
+            uri: lb://ms-transfer
+            predicates:
+              - Path=/transfer/**
 eureka:
   client:
     enabled: true

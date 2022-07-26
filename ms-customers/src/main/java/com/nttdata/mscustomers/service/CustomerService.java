@@ -1,5 +1,6 @@
 package com.nttdata.mscustomers.service;
 
+import com.nttdata.mscustomers.model.Account;
 import com.nttdata.mscustomers.model.Customer;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Flux;
@@ -15,4 +16,6 @@ public interface CustomerService {
     Mono<Customer> update(Customer c, String id);
 
     Mono<Customer> delete(String id);
+
+    Flux<Account> summaryCustomerByProduct();
 }

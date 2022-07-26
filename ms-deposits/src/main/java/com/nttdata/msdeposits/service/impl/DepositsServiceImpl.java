@@ -15,6 +15,7 @@ import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.math.BigDecimal;
 import java.time.Duration;
 
 @Service
@@ -43,11 +44,29 @@ public class DepositsServiceImpl implements DepositsService{
                 .hasElement()
                 .flatMap( y -> {
                     if(y){
-                        return repository.save(c);
+                        return accountClient.getAccountWithDetails(c.getAccountId()).flatMap(account -> {
+                            if(account.getMaxAmountTransaction() > account.getCurrentNumberTransaction()) {
+                                return updateCurrentNumberTransaction(accountClient.getAccountWithDetails(c.getAccountId()))
+                                        .flatMap(trans -> {
+                                            return repository.save(c);
+                                        });
+                            } else {
+                                // Maximo Numero de transacciones, se cobra comision
+                                c.setDepositAmount(c.getDepositAmount().add(account.getCommission().multiply(c.getDepositAmount().divide(BigDecimal.valueOf(100)))));
+                                return repository.save(c);
+                            }
+                        });
                     }else{
                         return Mono.error(new RuntimeException("La cuenta ingresada no es una cuenta bancaria"));
                     }
                 });
+    }
+
+    public Mono<Account> updateCurrentNumberTransaction(Mono<Account> trans) {
+        return trans.flatMap(t -> {
+            t.setCurrentNumberTransaction(t.getCurrentNumberTransaction()+1);
+            return accountClient.updateAccount(t);
+        });
     }
 
     @Override

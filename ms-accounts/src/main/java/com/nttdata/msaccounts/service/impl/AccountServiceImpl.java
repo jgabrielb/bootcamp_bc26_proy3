@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -122,16 +123,86 @@ public class AccountServiceImpl implements AccountService {
                                                            .filter( (x -> x.getTypeCustomer() == 2) ) // Validar si el customerId es empresarial
                                                            .hasElement()
                                                            .flatMap( yy -> {
-                                                               if ( zz && yy){
-                                                                   return Mono.error(new RuntimeException("El cliente empresarial no puede tener una cuenta de ahorros o plazo fijo"));
-                                                               }else{
-                                                                   return repository.save(a);
-                                                               }
+                                                               return customerClient.getCustomer(a.getCustomerId()).flatMap(customerToSend -> {
+
+                                                                   return productClient.getProduct(a.getProductId()).flatMap(pToSend -> {
+                                                                       if ( zz && yy && customerToSend.getTypeCustomer() == 2){
+                                                                           return Mono.error(new RuntimeException("El cliente empresarial no puede tener una cuenta de ahorros o plazo fijo"));
+                                                                       }else if(customerToSend.getTypeCustomer() == 1 || customerToSend.getTypeCustomer() == 2){
+                                                                           if (a.getCreditActually().compareTo(BigDecimal.ZERO)<=0) {
+                                                                               a.setCreditActually(BigDecimal.ZERO);
+                                                                           }
+                                                                           return repository.save(a);
+                                                                       } else if (customerToSend.getTypeCustomer() == 3) {
+                                                                           Boolean b = pToSend.getAmountPerDay().compareTo(BigDecimal.ZERO)>0 && pToSend.getAmountPerMonth().compareTo(BigDecimal.ZERO)>0;
+                                                                           return personalVipEmpresaPymeValidation(a, customerToSend.getTypeCustomer(), 1, b); // Cuenta de ahorro para Personal Vip
+                                                                       } else {
+
+                                                                           return personalVipEmpresaPymeValidation(a, customerToSend.getTypeCustomer(), 2 , true); // Cuenta corriente Empresarial Pyme
+                                                                       }
+                                                                   });
+                                                                   });
                                                            });
                                                });
                                    }
                                 });
                     }
+                });
+    }
+
+    public Mono<Account> personalVipEmpresaPymeValidation(Account t, int typeCostumerToValidate, int typeProductToValidate, Boolean f) {
+        return hasCreditCard(t).filter(btc -> btc.equals(Boolean.TRUE))
+                .hasElements()
+                .flatMap(bTarjetaCredito -> {
+                    if (Boolean.TRUE.equals(bTarjetaCredito)) {
+                        return productClient.getProduct(t.getProductId())
+                                .filter( x -> (x.getTypeProduct() == typeProductToValidate && f)
+                                        || x.getTypeProduct() == 6)
+                                .hasElement()
+                                .flatMap( bp -> {
+                                    return customerClient.getCustomer(t.getCustomerId())
+                                            .filter( (x -> x.getTypeCustomer() == typeCostumerToValidate) )
+                                            .hasElement()
+                                            .flatMap( bc -> {
+                                                if ( bp  && bc ){
+                                                    if (t.getCreditActually().compareTo(BigDecimal.ZERO)<=0) {
+                                                        t.setCreditActually(BigDecimal.ZERO);
+                                                    }
+                                                    // Comision 0 para personal vip y empresarial pyme
+                                                    t.setCommission(BigDecimal.ZERO);
+                                                    return repository.save(t);
+                                                    //
+                                                }else{
+                                                    return Mono.error(new RuntimeException("No se pudo crear una cuenta de ahorro para Personal VIP, no cumple las condiciones"));
+                                                }
+                                            });
+                                });
+                    } else {
+                        return productClient.getProduct(t.getProductId())
+                                .filter( x -> ( x.getTypeProduct() == 6 ))
+                                .hasElement()
+                                .flatMap( bp -> {
+                                    if (bp) {
+                                        if (t.getCreditActually().compareTo(BigDecimal.ZERO)<=0) {
+                                            t.setCreditActually(BigDecimal.ZERO);
+                                        }
+                                        // Comision 0 para personal vip y empresarial pyme
+                                        t.setCommission(BigDecimal.ZERO);
+                                        return repository.save(t);
+                                    } else {
+                                        return Mono.error(new RuntimeException("Solo puede crearse cuenta de ahorro para Personal Vip, si tiene tarjeta de credito"));
+                                    }
+                                });
+                    }
+                });
+    }
+
+    public Flux<Boolean> hasCreditCard(Account t) {
+        //account - productId - evaluarProductId - boolean
+        return findAll().filter(trans -> trans.getCustomerId().equalsIgnoreCase(t.getCustomerId()))
+                .flatMap(trans -> {
+                    return productClient.getProduct(trans.getProductId()).filter(prod -> prod.getTypeProduct() == 6)
+                            .hasElement();
                 });
     }
 
@@ -195,6 +266,9 @@ public class AccountServiceImpl implements AccountService {
                     x.setCreditLimits(a.getCreditLimits());
                     x.setCreditActually(a.getCreditActually());
                     x.setMovementDate(a.getMovementDate());
+                    x.setCardNumber(a.getCardNumber());
+                    x.setMaxAmountTransaction(a.getMaxAmountTransaction());
+                    x.setCurrentNumberTransaction(a.getCurrentNumberTransaction());
                     return repository.save(x);
                 });
     }

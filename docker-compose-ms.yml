@@ -89,6 +89,22 @@ services:
     - 9011:9011
     networks:
       - msbasic
+  ms-transfer:
+    image: ms-transfer:1.0.0
+    container_name: ms-transfer
+    restart: always
+    ports:
+      - 9012:9012
+    networks:
+      - msbasic
+  ms-debit-card:
+    image: ms-debit-card:1.0.0
+    container_name: ms-debit-card
+    restart: always
+    ports:
+      - 9013:9013
+    networks:
+      - msbasic
 networks:
   msbasic:
     name: bootcamp_bc26
