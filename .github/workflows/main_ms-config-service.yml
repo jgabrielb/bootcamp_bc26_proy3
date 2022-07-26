@@ -27,7 +27,8 @@ jobs:
         run: mvn clean
       
       - name: Install with maven
-        run:  mvn -DGIT_BRANCH=main -DGIT_USER=${{ secrets.GIT_USERNAME }} -DGIT_PSWD=${{ secrets.GIT_PASSWORD }} install
+        # run:  mvn -DGIT_BRANCH=main -DGIT_USER=${{ secrets.GIT_USERNAME }} -DGIT_PSWD=${{ secrets.GIT_PASSWORD }} install
+        run: mvn -Dspring-boot.run.arguments="--GIT_BRANCH=main --GIT_USER=${{ secrets.GIT_USERNAME }} --GIT_PSWD=${{ secrets.GIT_PASSWORD }}" install
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v2
