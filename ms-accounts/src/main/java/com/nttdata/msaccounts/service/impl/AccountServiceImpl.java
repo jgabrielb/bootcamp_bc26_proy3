@@ -132,7 +132,7 @@ public class AccountServiceImpl implements AccountService {
                                                                            if (a.getCreditActually().compareTo(BigDecimal.ZERO)<=0) {
                                                                                a.setCreditActually(BigDecimal.ZERO);
                                                                            }
-                                                                           return repository.save(a);
+                                                                           return expiredDebt(a);
                                                                        } else if (customerToSend.getTypeCustomer() == 3) {
                                                                            Boolean b = pToSend.getAmountPerDay().compareTo(BigDecimal.ZERO)>0 && pToSend.getAmountPerMonth().compareTo(BigDecimal.ZERO)>0;
                                                                            return personalVipEmpresaPymeValidation(a, customerToSend.getTypeCustomer(), 1, b); // Cuenta de ahorro para Personal Vip
@@ -170,7 +170,7 @@ public class AccountServiceImpl implements AccountService {
                                                     }
                                                     // Comision 0 para personal vip y empresarial pyme
                                                     t.setCommission(BigDecimal.ZERO);
-                                                    return repository.save(t);
+                                                    return expiredDebt(t);
                                                     //
                                                 }else{
                                                     return Mono.error(new RuntimeException("No se pudo crear una cuenta de ahorro para Personal VIP, no cumple las condiciones"));
@@ -188,7 +188,7 @@ public class AccountServiceImpl implements AccountService {
                                         }
                                         // Comision 0 para personal vip y empresarial pyme
                                         t.setCommission(BigDecimal.ZERO);
-                                        return repository.save(t);
+                                        return expiredDebt(t);
                                     } else {
                                         return Mono.error(new RuntimeException("Solo puede crearse cuenta de ahorro para Personal Vip, si tiene tarjeta de credito"));
                                     }
@@ -289,6 +289,21 @@ public class AccountServiceImpl implements AccountService {
         x.setPayments(new ArrayList<>(o));
         x.setPurchases(new ArrayList<>(t));
         x.setSignatories(new ArrayList<>(p));
+    }
+
+    private Mono<Account> expiredDebt (Account account) {
+        return findAllWithDetail().filter(a -> a.getCustomerId().equalsIgnoreCase(account.getCustomerId()))
+                .filter(a -> a.getProduct().getIndProduct() == 1)
+                .filter(a -> a.getExpiredDebt() == "S")
+                .hasElements()
+                .flatMap(deuda -> {
+                    if(deuda) {
+                        return Mono.error(new RuntimeException("Tiene una deuda vencida"));
+                    } else {
+                        return repository.save(account);
+                    }
+
+                });
     }
 
 }
