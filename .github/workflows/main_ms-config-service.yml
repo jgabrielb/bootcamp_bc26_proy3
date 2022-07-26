@@ -30,7 +30,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: ms-config-service
-          # path: '${{ github.workspace }}/ms-config-service/target/*.jar'
+          path: '${{ github.workspace }}/ms-config-service/target/*.jar'
 
   deploy:
     runs-on: ubuntu-latest
