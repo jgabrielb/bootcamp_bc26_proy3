@@ -28,7 +28,8 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: java-app
-          path: '${{ github.workspace }}/tree/main/ms-config-service/target/*.jar'
+          # path: '${{ github.workspace }}/ms-config-service/target/*.jar'
+          path: './ms-config-service/target/*.jar'
 
   deploy:
     runs-on: ubuntu-latest
