@@ -1,14 +1,19 @@
 package com.nttdata.msproducts.Controller;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.nttdata.msproducts.model.Account;
 import com.nttdata.msproducts.model.Products;
 import com.nttdata.msproducts.service.ProductsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.client.loadbalancer.Response;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.time.LocalDate;
 
 @RestController
 @RequestMapping("/products")
@@ -47,6 +52,15 @@ public class ProductsController {
         return service.delete(id)
                 .map( r -> ResponseEntity.ok().<Void>build())
                 .defaultIfEmpty(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/findByDate/{startDate}/{endDate}")
+    public Flux<Account> findByDate(@PathVariable @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+                                          @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+                                          LocalDate startDate, @PathVariable @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+                                          @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+                                          LocalDate endDate) {
+        return service.findByDate(startDate, endDate);
     }
 
 }

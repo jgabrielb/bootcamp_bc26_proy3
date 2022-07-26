@@ -40,9 +40,21 @@ public class Account {
 
     private BigDecimal commission;
 
+    private String cardNumber;
+
+    private int maxAmountTransaction;
+
+    private int currentNumberTransaction;
+
+    private String expiredDebt;
+
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate movementDate;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    private LocalDate registrationDate;
 
     @Transient
     private Customer customer;

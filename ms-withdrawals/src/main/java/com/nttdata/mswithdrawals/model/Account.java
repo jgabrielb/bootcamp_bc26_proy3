@@ -27,6 +27,11 @@ public class Account {
 
     private BigDecimal commission;
 
+    private String cardNumber;
+
+    private int maxAmountTransaction;
+
+    private int currentNumberTransaction;
 
     private LocalDate movementDate;
 

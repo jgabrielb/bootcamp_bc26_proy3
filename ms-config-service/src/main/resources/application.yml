@@ -7,7 +7,7 @@ spring:
     config:
       server:
         git:
-          uri: https://github.com/jgabrielb/bootcamp_bc26_proy2.git
+          uri: https://github.com/jgabrielb/bootcamp_bc26_proy3.git
           search-paths: ms-config-data
           default-label: ${GIT_BRANCH}
           username: ${GIT_USER}

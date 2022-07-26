@@ -1,4 +1,5 @@
 package com.nttdata.mscustomers.controller;
+import com.nttdata.mscustomers.model.Account;
 import com.nttdata.mscustomers.model.Customer;
 import com.nttdata.mscustomers.service.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +48,11 @@ public class CustomerController {
         return service.delete(id)
                 .map( r -> ResponseEntity.ok().<Void>build())
                 .defaultIfEmpty(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/summaryCustomerByProduct")
+    public Flux<Account> summaryCustomerByProduct(){
+        return service.summaryCustomerByProduct();
     }
 
 }

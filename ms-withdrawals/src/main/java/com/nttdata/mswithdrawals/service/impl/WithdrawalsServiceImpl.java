@@ -1,6 +1,7 @@
 package com.nttdata.mswithdrawals.service.impl;
 
 import com.nttdata.mswithdrawals.client.AccountClient;
+import com.nttdata.mswithdrawals.model.Account;
 import com.nttdata.mswithdrawals.model.Withdrawals;
 import com.nttdata.mswithdrawals.repository.WithdrawalsRepository;
 import com.nttdata.mswithdrawals.service.WithdrawalsService;
@@ -11,6 +12,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.math.BigDecimal;
 
 @Service
 @Transactional
@@ -38,7 +41,18 @@ public class WithdrawalsServiceImpl implements WithdrawalsService {
                 .hasElement()
                 .flatMap( y -> {
                     if(y){
-                        return repository.save(c);
+                        return accountClient.getAccountWithDetails(c.getAccountId()).flatMap(account -> {
+                            if(account.getMaxAmountTransaction() > account.getCurrentNumberTransaction()) {
+                                return updateCurrentNumberTransaction(accountClient.getAccountWithDetails(c.getAccountId()))
+                                        .flatMap(trans -> {
+                                            return repository.save(c);
+                                        });
+                            } else {
+                                // Maximo Numero de transacciones, se cobra comision
+                                c.setWithdrawalsAmount(c.getWithdrawalsAmount().add(account.getCommission().multiply(c.getWithdrawalsAmount().divide(BigDecimal.valueOf(100)))));
+                                return repository.save(c);
+                            }
+                        });
                     }else{
                         return Mono.error(new RuntimeException("La cuenta ingresada no es una cuenta bancaria"));
                     }
@@ -70,5 +84,12 @@ public class WithdrawalsServiceImpl implements WithdrawalsService {
         return repository.findById(id)
                 .flatMap( x -> repository.delete(x)
                         .then(Mono.just(x)));
+    }
+
+    public Mono<Account> updateCurrentNumberTransaction(Mono<Account> trans) {
+        return trans.flatMap(t -> {
+            t.setCurrentNumberTransaction(t.getCurrentNumberTransaction()+1);
+            return accountClient.updateTransaction(t);
+        });
     }
 }
