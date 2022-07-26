@@ -12,7 +12,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
+    defaults:
+      run:
+        working-directory: ms-config-service
     steps:
       - uses: actions/checkout@v2
 
@@ -21,14 +23,18 @@ jobs:
         with:
           java-version: '11'
 
-      - name: Build with Maven
-        run: mvn clean install
+      - name: Cleaning with Maven
+        run: mvn clean
+      
+      - name: Install with maven
+        # run:  mvn -DGIT_BRANCH=main -DGIT_USER=${{ secrets.GIT_USERNAME }} -DGIT_PSWD=${{ secrets.GIT_PASSWORD }} install
+        run: mvn -Dspring-boot.run.arguments="--GIT_BRANCH=main --GIT_USER=${{ secrets.GIT_USERNAME }} --GIT_PSWD=${{ secrets.GIT_PASSWORD }}" install
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v2
         with:
-          name: java-app
-          path: '${{ github.workspace }}/tree/main/ms-config-service/target/*.jar'
+          name: ms-config-service
+          path: '${{ github.workspace }}/ms-config-service/target/*.jar'
 
   deploy:
     runs-on: ubuntu-latest
@@ -41,7 +47,7 @@ jobs:
       - name: Download artifact from build job
         uses: actions/download-artifact@v2
         with:
-          name: java-app
+          name: ms-config-service
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
