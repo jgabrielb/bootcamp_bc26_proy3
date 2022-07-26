@@ -4,9 +4,9 @@
 name: Build and deploy JAR app to Azure Web App - ms-config-service
 
 on:
-  push:
-    branches:
-      - main
+  # push:
+    # branches:
+      # - main
   workflow_dispatch:
 
 jobs:
@@ -23,12 +23,12 @@ jobs:
         with:
           java-version: '11'
 
-      - name: Cleaning with Maven
-        run: mvn clean
-      
-      - name: Install with maven
-        # run:  mvn -DGIT_BRANCH=main -DGIT_USER=${{ secrets.GIT_USERNAME }} -DGIT_PSWD=${{ secrets.GIT_PASSWORD }} install
-        run: mvn -Dspring-boot.run.arguments="--GIT_BRANCH=main --GIT_USER=${{ secrets.GIT_USERNAME }} --GIT_PSWD=${{ secrets.GIT_PASSWORD }}" install
+      - name: Build with Maven
+        # env:
+          # GIT_BRANCH: main
+          # GIT_USER: ${{ secrets.GIT_USERNAME }}
+          # GIT_PSWD: ${{ secrets.GIT_PASSWORD }}
+        run: mvn clean install
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v2
