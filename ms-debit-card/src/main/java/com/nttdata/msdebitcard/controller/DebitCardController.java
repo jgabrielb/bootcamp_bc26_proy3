@@ -36,6 +36,12 @@ public class DebitCardController {
         return service.accountDetail(id);
     }
 
+    @GetMapping("/principalDebitAccount/{id}")
+    public Flux<DebitCard> principalDebitAccount(@PathVariable String id) {
+        LOG.info("Service call principalDebitAccount - DebitCard");
+        return service.principalDebitAccount(id);
+    }
+
     @PostMapping("/create")
     public Mono<DebitCard> createDebitCard(@RequestBody DebitCard p) {
         LOG.info("Service call create - DebitCard");

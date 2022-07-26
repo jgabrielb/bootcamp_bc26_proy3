@@ -33,7 +33,8 @@ public class DebitCardServiceImpl implements DebitCardService {
     }
 
     private void ValorAllValidator(DebitCard debitCard, List<Account> account) {
-        debitCard.setTransaction(account);
+        account.sort((o1, o2) -> o1.getCreditCardAssociationDate().compareTo(o2.getCreditCardAssociationDate()));
+        debitCard.setAccount(account);
     }
 
     @Override
@@ -65,4 +66,17 @@ public class DebitCardServiceImpl implements DebitCardService {
         return repository.deleteById(id);
     }
 
+    @Override
+    public Flux<DebitCard> principalDebitAccount(String cardNumber) {
+        return findAll().filter(dc -> dc.getCardNumber().equalsIgnoreCase(cardNumber))
+                .flatMap(debitCard -> accountClient.findAllWithDetail()
+                        .filter(trans -> trans.getCardNumber().equalsIgnoreCase(cardNumber) && trans.getCardNumber().equalsIgnoreCase(debitCard.getCardNumber()))
+                        .collectList()
+                        .flatMapMany(trans -> {
+                            trans.sort((o1, o2) -> o1.getCreditCardAssociationDate().compareTo(o2.getCreditCardAssociationDate()));
+                            Account otrans = trans.stream().filter(t -> t.getProduct().getIndProduct() == 2 ).findFirst().get();
+                            debitCard.setTrans(otrans);
+                            return Flux.just(debitCard);
+                        }));
+    }
 }

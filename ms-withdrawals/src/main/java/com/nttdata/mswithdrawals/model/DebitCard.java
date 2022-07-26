@@ -1,4 +1,4 @@
-package com.nttdata.msdebitcard.model;
+package com.nttdata.mswithdrawals.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
@@ -7,12 +7,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.List;
 
-@Document(collection = "schema_account.debitcard")
-@JsonInclude(JsonInclude.Include.NON_EMPTY)
 @Data
 @Builder
 @AllArgsConstructor
@@ -29,16 +26,13 @@ public class DebitCard {
     private Product product;
 
     @Transient
-    private List<Account> account;
-
-    @Transient
-    private Account trans;
+    private List<Account> transaction;
 
     @Transient
     private List<Deposit> deposit;
 
     @Transient
-    private List<Withdrawal> withdrawal;
+    private List<Withdrawals> withdrawal;
 
     @Transient
     private List<Payment> payments;

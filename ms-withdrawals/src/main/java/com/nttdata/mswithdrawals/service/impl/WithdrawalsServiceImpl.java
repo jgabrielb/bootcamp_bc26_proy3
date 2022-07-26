@@ -1,6 +1,7 @@
 package com.nttdata.mswithdrawals.service.impl;
 
 import com.nttdata.mswithdrawals.client.AccountClient;
+import com.nttdata.mswithdrawals.client.DebitCardClient;
 import com.nttdata.mswithdrawals.model.Account;
 import com.nttdata.mswithdrawals.model.Withdrawals;
 import com.nttdata.mswithdrawals.repository.WithdrawalsRepository;
@@ -27,6 +28,9 @@ public class WithdrawalsServiceImpl implements WithdrawalsService {
     @Autowired
     AccountClient accountClient;
 
+    @Autowired
+    DebitCardClient debitCardClient;
+
     @Override
     public Flux<Withdrawals> findAll() {
         logger.info("Executing findAll method");
@@ -45,12 +49,12 @@ public class WithdrawalsServiceImpl implements WithdrawalsService {
                             if(account.getMaxAmountTransaction() > account.getCurrentNumberTransaction()) {
                                 return updateCurrentNumberTransaction(accountClient.getAccountWithDetails(c.getAccountId()))
                                         .flatMap(trans -> {
-                                            return repository.save(c);
+                                            return validateDebitCard(c);
                                         });
                             } else {
                                 // Maximo Numero de transacciones, se cobra comision
                                 c.setWithdrawalsAmount(c.getWithdrawalsAmount().add(account.getCommission().multiply(c.getWithdrawalsAmount().divide(BigDecimal.valueOf(100)))));
-                                return repository.save(c);
+                                return validateDebitCard(c);
                             }
                         });
                     }else{
@@ -91,5 +95,20 @@ public class WithdrawalsServiceImpl implements WithdrawalsService {
             t.setCurrentNumberTransaction(t.getCurrentNumberTransaction()+1);
             return accountClient.updateTransaction(t);
         });
+    }
+
+    private Mono<Withdrawals> validateDebitCard(Withdrawals withdrawal){
+        return accountClient.getAccountWithDetails(withdrawal.getAccountId())
+                .flatMap(trans -> debitCardClient.getAccountDetailByDebitCard(trans.getCardNumber())
+                        .collectList()
+                        .flatMap(dc -> {
+                            Account otrans = dc.stream().findFirst().get().getTransaction().stream().filter(t -> t.getProduct().getIndProduct() == 2 && t.getCreditActually().compareTo(withdrawal.getWithdrawalsAmount()) >= 0).findFirst().get();
+                            if (otrans != null) {
+                                withdrawal.setAccountId(otrans.getId());
+                                return repository.save(withdrawal);
+                            }else {
+                                return Mono.error(new RuntimeException("No hay cuentas con sado disponible"));
+                            }
+                        }));
     }
 }

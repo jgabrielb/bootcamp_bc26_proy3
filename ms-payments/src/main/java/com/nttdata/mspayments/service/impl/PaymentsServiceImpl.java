@@ -73,4 +73,5 @@ public class PaymentsServiceImpl implements PaymentsService {
                 .flatMap( x -> repository.delete(x)
                         .then(Mono.just(x)));
     }
+
 }

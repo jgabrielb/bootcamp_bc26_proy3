@@ -15,11 +15,11 @@ import java.time.LocalDate;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Withdrawal {
+public class Withdrawal  implements DateInterface{
     private String id;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-    private LocalDate withdrawalsDate;
+    private LocalDate date;
 
     private BigDecimal withdrawalsAmount ;
     private String currency;
