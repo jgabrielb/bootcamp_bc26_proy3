@@ -24,11 +24,11 @@ jobs:
           java-version: '11'
 
       - name: Build with Maven
-        env:
-          GIT_BRANCH: main
-          GIT_USER: ${{ secrets.GIT_USERNAME }}
-          GIT_PSWD: ${{ secrets.GIT_PASSWORD }}
-        run: mvn clean install
+        # env:
+          # GIT_BRANCH: main
+          # GIT_USER: ${{ secrets.GIT_USERNAME }}
+          # GIT_PSWD: ${{ secrets.GIT_PASSWORD }}
+        run: mvn --GIT_BRANCH=main clean install
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v2
