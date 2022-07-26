@@ -2,4 +2,7 @@ spring:
   application:
     name: ms-deposits
   config:
-    import: optional:configserver:http://ms-config-service:9001
+    # LOCAL
+    # import: optional:configserver:http://ms-config-service:9001
+    # AZURE
+    import: optional:configserver:http://ms-config-service.azurewebsites.net

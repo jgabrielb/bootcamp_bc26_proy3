@@ -10,5 +10,3 @@ spring:
           uri: https://github.com/jgabrielb/bootcamp_bc26_proy3.git
           search-paths: ms-config-data
           default-label: ${GIT_BRANCH}
-          username: ${GIT_USER}
-          password: ${GIT_PSWD}
