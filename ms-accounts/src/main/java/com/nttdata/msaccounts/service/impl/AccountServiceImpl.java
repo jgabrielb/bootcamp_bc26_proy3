@@ -306,4 +306,50 @@ public class AccountServiceImpl implements AccountService {
                 });
     }
 
+    @Override
+    public Flux<Account> lastTenMovements() {
+        return repository.findAll()
+                .flatMap( trans -> customerClient.getCustomer(trans.getCustomerId())
+                        .flatMapMany( customer -> {
+                            return productClient.getProduct(trans.getProductId())
+                                    .flatMapMany( product -> depositClient.getDeposits()
+                                            .filter(x -> x.getAccountId().equals(trans.getId()))
+                                            .collectList()
+                                            .flatMapMany((deposit -> {
+                                                return withdrawalClient.getWithdrawals()
+                                                        .filter(i -> i.getAccountId().equals(trans.getId()))
+                                                        .collectList()
+                                                        .flatMapMany(( withdrawals -> {
+                                                            return paymentClient.getPayments()
+                                                                    .filter(z -> z.getAccountId().equals(trans.getId()))
+                                                                    .collectList()
+                                                                    .flatMapMany((payments -> {
+                                                                        return purchaseClient.getPurchases()
+                                                                                .filter(y -> y.getAccountId().equals(trans.getId()))
+                                                                                .collectList()
+                                                                                .flatMapMany(purchases -> {
+                                                                                    return signatoryClient.getSignatories()
+                                                                                            .filter(o -> o.getAccountId().equals(trans.getId()))
+                                                                                            .collectList()
+                                                                                            .flatMapMany(signatories -> {
+                                                                                                List<DateInterface> x= new ArrayList<>();
+                                                                                                x.addAll(deposit);
+                                                                                                x.addAll(withdrawals);
+                                                                                                x.addAll(payments);
+                                                                                                x.addAll(purchases);
+                                                                                                x.sort((o1, o2) -> o1.getDate().compareTo(o2.getDate()));
+                                                                                                logger.info(x.toString());
+                                                                                                return Flux.fromIterable(x).take(10).collectList().flatMapMany(to -> {
+                                                                                                    trans.setMovements(to);
+                                                                                                    return Flux.just(trans);
+                                                                                                });
+                                                                                            });
+                                                                                });
+
+                                                                    } ));
+                                                        } ));
+                                            })));
+                        }));
+    }
+
 }

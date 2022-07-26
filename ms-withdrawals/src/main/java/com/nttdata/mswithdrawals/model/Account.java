@@ -1,12 +1,18 @@
 package com.nttdata.mswithdrawals.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 public class Account {
+    @Id
     private String id;
 
     private String customerId;
@@ -33,7 +39,34 @@ public class Account {
 
     private int currentNumberTransaction;
 
+    private String expiredDebt;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate movementDate;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    private LocalDate registrationDate;
+
+    @Transient
+    private Customer customer;
+
+    @Transient
     private Product product;
+
+    @Transient
+    private List<Deposit> deposits;
+
+    @Transient
+    private List<Withdrawals> withdrawals;
+
+    @Transient
+    private List<Payment> payments;
+
+    @Transient
+    private List<Purchase> purchases;
+
+    @Transient
+    private List<Signatories> signatories;
 }

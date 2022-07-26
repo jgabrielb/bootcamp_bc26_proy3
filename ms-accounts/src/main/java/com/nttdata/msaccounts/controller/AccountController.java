@@ -56,4 +56,9 @@ public class AccountController {
                 .map( r -> ResponseEntity.ok().<Void>build())
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }
+
+    @GetMapping("/lastTenMovements")
+    public Flux<Account> getLastTenMovements(){
+        return service.lastTenMovements();
+    }
 }

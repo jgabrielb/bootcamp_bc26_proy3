@@ -56,6 +56,10 @@ public class Account {
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate registrationDate;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    private LocalDate creditCardAssociationDate;
+
     @Transient
     private Customer customer;
 
@@ -76,5 +80,8 @@ public class Account {
 
     @Transient
     private List<Signatories> signatories;
+
+    @Transient
+    private List<DateInterface> movements;
 
 }

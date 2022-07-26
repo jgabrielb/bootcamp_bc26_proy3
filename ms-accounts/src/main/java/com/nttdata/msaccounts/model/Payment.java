@@ -13,10 +13,10 @@ import java.time.LocalDate;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Payment {
+public class Payment  implements DateInterface{
     private String id;
 
-    private LocalDate paymentDate;
+    private LocalDate date;
     private BigDecimal paymentAmount;
     private String description;
 
